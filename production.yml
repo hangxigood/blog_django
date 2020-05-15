@@ -1,22 +1,20 @@
-version: ￿'3￿'
+version: '3'
 
-volumes￿:
+volumes:
   static:
   database:
   esdata:
 
 services:
-
   web:
     build:
       context: .
-      dockerfile: compose/production/Dockerfile
+      dockerfile: compose/production/Django/Dockerfile
     image: blog_web
     container_name: blog_web
     working_dir: /blog_project
-
     volumes:
-      - static: /blog_project/static
+      - static:/blog_project/static
     env_file: /compose/production/Django/blog_django.env
     ports:
       - "8000:8000"
@@ -37,7 +35,7 @@ services:
     image: blog_ngnix
     container_name: blog_ngnix
     volumes:
-    - static: /apps/blog_project/static
+    - static:apps/blog_project/static
     ports:
     - "80:80"
     - "443:443"
@@ -51,7 +49,7 @@ services:
     image: blog_elasticsearch
     container_name: blog_elasticsearch
     volumes:
-      - esdata: /usr/share/elasticsearch/data
+      - esdata:/usr/share/elasticsearch/data
     ports:
       - "9200:9200"
     environment:
@@ -70,7 +68,6 @@ services:
     container_name: blog_redis
     ports:
       - "6379:6379"
-
   database:
     image: mysql:5.7
     container_name: blog_database
@@ -79,4 +76,4 @@ services:
     ports:
       - "3306:3306"
     volumes:
-      - database: /var/lib/mysql
+      - database:var/lib/mysql
