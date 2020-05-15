@@ -1,0 +1,82 @@
+version: ￿'3￿'
+
+volumes￿:
+  static:
+  database:
+  esdata:
+
+services:
+
+  web:
+    build:
+      context: .
+      dockerfile: compose/production/Dockerfile
+    image: blog_web
+    container_name: blog_web
+    working_dir: /blog_project
+
+    volumes:
+      - static: /blog_project/static
+    env_file: /compose/production/Django/blog_django.env
+    ports:
+      - "8000:8000"
+    links:
+      - database
+      - redis
+      - elasticsearch
+    depends_on:
+      - database
+      - redis
+      - elasticsearch
+    command: /start.sh
+
+  ngnix:
+    build:
+      context: .
+      dockerfile: compose/production/nginx/Dockerfile
+    image: blog_ngnix
+    container_name: blog_ngnix
+    volumes:
+    - static: /apps/blog_project/static
+    ports:
+    - "80:80"
+    - "443:443"
+    depends_on:
+      - web
+
+  elasticsearch:
+    build:
+      context: .
+      dockerfile: ./compose/production/elasticsearch/Dockerfile
+    image: blog_elasticsearch
+    container_name: blog_elasticsearch
+    volumes:
+      - esdata: /usr/share/elasticsearch/data
+    ports:
+      - "9200:9200"
+    environment:
+      - "ES_JAVA_OPTS=-Xms512m -Xmx512m"
+    ulimits:
+      memlock:
+        soft: -1
+        hard: -1
+      nproc: 65536
+      nofile:
+        soft: 65536
+        hard: 65536
+
+  redis:
+    image: redis
+    container_name: blog_redis
+    ports:
+      - "6379:6379"
+
+  database:
+    image: mysql:5.7
+    container_name: blog_database
+    environment:
+      MYSQL_ROOT_PASSWORD: 'sheep'
+    ports:
+      - "3306:3306"
+    volumes:
+      - database: /var/lib/mysql
