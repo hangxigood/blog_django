@@ -17,7 +17,7 @@ WORKDIR /blog_project
 
 COPY requirements.txt /blog_project/
 
-RUN pip install -r /blog_project/requirements.txt
+RUN pip install -r /blog_project/requirements.txt -i https://pypi.douban.com/simple
 
 COPY ./compose/local/start.sh /start.sh
 

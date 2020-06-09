@@ -9,23 +9,27 @@ https://docs.djangoproject.com/en/3.0/topics/settings/
 For the full list of settings and their values, see
 https://docs.djangoproject.com/en/3.0/ref/settings/
 """
-
+import datetime
 import os
 
 # Build paths inside the project like this: os.path.join(BASE_DIR, ...)
+
 BASE_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 
 # Quick-start development settings - unsuitable for production
 # See https://docs.djangoproject.com/en/3.0/howto/deployment/checklist/
 
-# SECURITY WARNING: keep the secret key used in production secret!
-#SECRET_KEY = ''
 
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = False
 
 ALLOWED_HOSTS = [
-    '*',
+    "localhost",
+    "0.0.0.0",
+    "127.0.0.1",
+    "blog-web-pdct",
+    "blog-web-local",
+    "blog.frankxiang.xyz",
 ]
 
 # Application definition
@@ -37,12 +41,11 @@ INSTALLED_APPS = [
     'django.contrib.sessions',
     'django.contrib.messages',
     'django.contrib.staticfiles',
-    'haystack',
     'myblog',
     'comments',
     'pure_pagination',
     'rest_framework',
-    #'debug_toolbar',
+    # 'debug_toolbar',
 ]
 
 MIDDLEWARE = [
@@ -54,8 +57,8 @@ MIDDLEWARE = [
     'django.contrib.auth.middleware.AuthenticationMiddleware',
     'django.contrib.messages.middleware.MessageMiddleware',
     'django.middleware.clickjacking.XFrameOptionsMiddleware',
-    #'debug_toolbar.middleware.DebugToolbarMiddleware',
-    'django.middleware.cache.FetchFromCacheMiddleware',
+    # 'debug_toolbar.middleware.DebugToolbarMiddleware',
+     'django.middleware.cache.FetchFromCacheMiddleware',
 ]
 
 CACHE_MIDDLEWARE_ALIAS = 'default'
@@ -89,10 +92,8 @@ DATABASES = {
     'default': {
         'ENGINE': 'django.db.backends.mysql',
         'NAME': 'blog',
-        'HOST': 'blog_database',
+        'HOST': '0.0.0.0',
         'PORT': 3306,
-        'USER': 'root',
-        'PASSWORD': 'sheep',
     }
 }
 
@@ -144,7 +145,7 @@ CACHES = {
     'default': {
         'BACKEND': 'django_redis.cache.RedisCache',
         'LOCATION': [
-            'redis://blog_redis:6379/0',
+            '',
         ],
         'KEY_PREFIX': 'teamproject',
         'OPTIONS': {
@@ -156,6 +157,7 @@ CACHES = {
     }
 }
 
+
 DEBUG_TOOLBAR_CONFIG = {
     # 引入jQuery库
     'JQUERY_URL': 'https://cdn.bootcss.com/jquery/3.3.1/jquery.min.js',
@@ -165,24 +167,28 @@ DEBUG_TOOLBAR_CONFIG = {
     'SHOW_TOOLBAR_CALLBACK': lambda x: True,
 }
 
-# 搜索设置
-HAYSTACK_CONNECTIONS = {
-    'default': {
-        'ENGINE': 'myblog.elasticsearch2_ik_backend.Elasticsearch2IkSearchEngine',
-        'URL': '',
-        'INDEX_NAME': 'blog',
-    },
-}
-HAYSTACK_SEARCH_RESULTS_PER_PAGE = 10
-HAYSTACK_SIGNAL_PROCESSOR = 'haystack.signals.RealtimeSignalProcessor'
-HAYSTACK_CONNECTIONS['default']['URL'] = 'http://blog_elasticsearch:9200/'
 
 REST_FRAMEWORK = {
-    'DEFAULT_PAGINATION_CLASS': 'rest_framework.pagination.PageNumberPagination',
+    'DEFAULT_AUTHENTICATION_CLASSES':('rest_framework_jwt.authentication.JSONWebTokenAuthentication',),
+    # 'DEFAULT_PAGINATION_CLASS': 'rest_framework.pagination.PageNumberPagination',
     'PAGE_SIZE': 10,
     'DEFAULT_VERSIONING_CLASS': 'rest_framework.versioning.URLPathVersioning',
     'DEFAULT_VERSION': 'v1',
     'VERSION_PARAM': 'version',
-    'ALLOWED_VERSIONS':['v1', 'v2'],
+    'ALLOWED_VERSIONS': ['v1'],
 }
+
+JWT_AUTH = {
+    'JWT_EXPIRATION_DELTA': datetime.timedelta(weeks=2),
+}
+
+
+# Docker-compose local
+# DATABASES['default']['HOST'] = 'database_local'
+# CACHES['default']['LOCATION'] = 'redis://redis_local:6379/0'
+
+# Docker-compose production
+DATABASES['default']['HOST'] = 'database-pdct'
+CACHES['default']['LOCATION'] = 'redis://redis-pdct:6379/0'
+
 

@@ -10,7 +10,7 @@ class PostAdmin(admin.ModelAdmin):
     fields = ['title', 'body', 'excerpt', 'category', 'tags']
     search_fields = ['title']
 
-    def save_model(self, request, obj, form, change):  # 重写方法，实现自动关联作者
+    def save_model(self, request, obj, form, change):  # 实现自动关联作者
         obj.author = request.user
         super().save_model(request, obj, form, change)
 

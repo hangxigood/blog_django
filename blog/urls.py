@@ -15,21 +15,28 @@ Including another URLconf
 """
 from django.contrib import admin
 from django.urls import path, include
+from django.views.decorators.cache import never_cache
 from rest_framework import routers
+from rest_framework_jwt.views import obtain_jwt_token
 
-from blog import settings
-from myblog import views
+from myblog import views as myblog_views
+from comments import views as comments_views
+
 
 router = routers.DefaultRouter()
-router.register(r'PostList', views.PostListView)
+router.register(r'Post', myblog_views.PostViewSet),
+router.register(r'Tag', myblog_views.TagsViewSet),
+router.register(r'Category', myblog_views.CategoryViewSet)
+router.register(r'Archive', myblog_views.ArchiveListViewSet, basename='Archive') # 因为 queryset 用的是 Post , 所以必须指定 basename
+router.register(r'Comment', comments_views.CommentViewSet)
+
 
 urlpatterns = [
     path('admin/', admin.site.urls),
     path('', include('myblog.urls')),
     path('', include('comments.urls')),
-    path('search/', include('haystack.urls')),
     path("api/<version>/", include(router.urls)),
-    path("api/auth/", include("rest_framework.urls", namespace="rest_framework")),
+    path('login/', obtain_jwt_token, name='login'),
 ]
 '''''
 if settings.DEBUG:
