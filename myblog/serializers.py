@@ -1,27 +1,38 @@
+from django.db.models import Count
 from django.http import request
 from django.urls import reverse
 from rest_framework import serializers
 
+import comments
 from comments.views import CommentSerializer
 from myblog.models import Post, Category, Tag
 
 
 class CategoryListSerializer(serializers.HyperlinkedModelSerializer):
+    posts_url = serializers.SerializerMethodField()
     class Meta:
         model = Category
         fields = [
             'name',
-            'url',
+            'posts_url',
         ]
 
+    def get_posts_url(self, obj):
+        return 'http://blog.frankxiang.xyz/api/v1/Post/?category=' + str(obj.id)
 
-class TagsListSerializer(serializers.HyperlinkedModelSerializer):
+
+class TagsListSerializer(serializers.ModelSerializer):
+    posts_url = serializers.SerializerMethodField()
+
     class Meta:
         model = Tag
         fields = [
             'name',
-            'url',
+            'posts_url',
         ]
+
+    def get_posts_url(self, obj):
+        return 'http://blog.frankxiang.xyz/api/v1/Post/?tags=' + str(obj.id)
 
 
 class PostListSerializer(serializers.HyperlinkedModelSerializer):
@@ -31,7 +42,16 @@ class PostListSerializer(serializers.HyperlinkedModelSerializer):
     comments_num = serializers.SerializerMethodField()
 
     def get_comments_num(self, obj):
-        return obj.comments.count()
+        return obj.comments_count
+        # return obj.comments.count()
+
+    @staticmethod
+    def setup_eager_loading(cls, queryset):
+        queryset = queryset.select_related('category')
+        queryset = queryset.select_related('author')
+        queryset = queryset.prefetch_related('tags')
+        queryset = queryset.annotate(comments_count=Count(comments))
+        return queryset
 
     class Meta:
         model = Post
@@ -39,6 +59,7 @@ class PostListSerializer(serializers.HyperlinkedModelSerializer):
             'title',
             'url',
             'author',
+            'created_time',
             'excerpt',
             'category',
             'tags',
@@ -68,41 +89,14 @@ class PostPostSerializer(serializers.ModelSerializer):
 class ArchiveDetailSerializer(serializers.Serializer):
     year = serializers.IntegerField(read_only=True)
     month = serializers.IntegerField(read_only=True)
-    posts = serializers.SerializerMethodField()
+    posts_url = serializers.SerializerMethodField()
 
-    def get_posts(self,obj):
-        queryset = Post.objects.filter(created_time__year=obj['year'], created_time__month=obj['month'])
-        return PostListSerializer(queryset, many=True, context={'request': self.context.get('request')}).data
+    def get_posts_url(self, obj):
+        return 'http://blog.frankxiang.xyz/api/v1/Post/?year={}&month={}'.format(obj['year'], obj['month'])
 
-
-class CategoryDetailSerializer(serializers.HyperlinkedModelSerializer):
-    posts = PostListSerializer(many=True)
-
-    class Meta:
-        model = Category
-        fields = (
-            'name',
-            'url',
-            'posts',
-        )
-        extra_kwargs = {
-            'posts': {'lookup_field': 'id'}
-        }
-
-
-class TagsDetailSerializer(serializers.HyperlinkedModelSerializer):
-    posts = PostListSerializer(many=True)
-
-    class Meta:
-        model = Tag
-        fields = [
-            'name',
-            'url',
-            'posts',
-        ]
-        extra_kwargs = {
-            'posts': {'lookup_field': 'id'}
-        }
+    # def get_posts(self,obj):
+    #     queryset = Post.objects.filter(created_time__year=obj['year'], created_time__month=obj['month'])
+    #     return PostListSerializer(queryset, many=True, context={'request': self.context.get('request')}).data
 
 
 class PostDetailSerializer(serializers.HyperlinkedModelSerializer):
