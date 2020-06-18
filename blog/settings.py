@@ -11,6 +11,7 @@ https://docs.djangoproject.com/en/3.0/ref/settings/
 """
 import datetime
 import os
+import environ
 
 # Build paths inside the project like this: os.path.join(BASE_DIR, ...)
 
@@ -21,7 +22,25 @@ BASE_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 
 
 # SECURITY WARNING: don't run with debug turned on in production!
-DEBUG = False
+env = environ.Env(
+    DEBUG=(bool, False)
+)
+
+environ.Env.read_env()
+DEBUG = env('DEBUG')
+SECRET_KEY = env('SECRET_KEY')
+
+DATABASES = {
+    'default': env.db(),
+}
+
+CACHES = {
+    'default': env.cache(),
+}
+
+CACHE_MIDDLEWARE_ALIAS = 'default'
+CACHE_MIDDLEWARE_SECONDS = 300
+CACHE_MIDDLEWARE_KEY_PREFIX = 'django:cache'
 
 ALLOWED_HOSTS = [
     "localhost",
@@ -43,10 +62,19 @@ INSTALLED_APPS = [
     'django.contrib.staticfiles',
     'myblog',
     'comments',
-    'pure_pagination',
     'rest_framework',
-   # 'debug_toolbar',
+    # 'debug_toolbar',
 ]
+
+
+DEBUG_TOOLBAR_CONFIG = {
+    # 引入jQuery库
+    'JQUERY_URL': 'https://cdn.bootcss.com/jquery/3.3.1/jquery.min.js',
+    # 工具栏是否折叠
+    'SHOW_COLLAPSED': True,
+    # 是否显示工具栏
+    'SHOW_TOOLBAR_CALLBACK': lambda x: True,
+}
 
 MIDDLEWARE = [
     'django.middleware.cache.UpdateCacheMiddleware',
@@ -57,13 +85,9 @@ MIDDLEWARE = [
     'django.contrib.auth.middleware.AuthenticationMiddleware',
     'django.contrib.messages.middleware.MessageMiddleware',
     'django.middleware.clickjacking.XFrameOptionsMiddleware',
-   # 'debug_toolbar.middleware.DebugToolbarMiddleware',
+    # 'debug_toolbar.middleware.DebugToolbarMiddleware',
     'django.middleware.cache.FetchFromCacheMiddleware',
 ]
-
-CACHE_MIDDLEWARE_ALIAS = 'default'
-CACHE_MIDDLEWARE_SECONDS = 300
-CACHE_MIDDLEWARE_KEY_PREFIX = 'django:cache'
 
 ROOT_URLCONF = 'blog.urls'
 
@@ -85,17 +109,6 @@ TEMPLATES = [
 ]
 
 WSGI_APPLICATION = 'blog.wsgi.application'
-
-# Database
-# https://docs.djangoproject.com/en/3.0/ref/settings/#databases
-DATABASES = {
-    'default': {
-        'ENGINE': 'django.db.backends.mysql',
-        'NAME': 'blog',
-        'HOST': '0.0.0.0',
-        'PORT': 3306,
-    }
-}
 
 # Password validation
 # https://docs.djangoproject.com/en/3.0/ref/settings/#auth-password-validators
@@ -134,42 +147,8 @@ USE_TZ = True
 STATIC_URL = '/static/'
 STATIC_ROOT = os.path.join(BASE_DIR, 'static/')
 
-PAGINATION_SETTINGS = {
-    'PAGE_RANGE_DISPLAYED': 4,  # 分页条当前页前后应该显示的总页数（两边均匀分布，因此要设置为偶数），
-    'MARGIN_PAGES_DISPLAYED': 2,  # 分页条开头和结尾显示的页数
-    'SHOW_FIRST_PAGE_WHEN_INVALID': True,  # 当请求了不存在页，显示第一页
-}
-
-CACHES = {
-    # 默认缓存
-    'default': {
-        'BACKEND': 'django_redis.cache.RedisCache',
-        'LOCATION': [
-            '',
-        ],
-        'KEY_PREFIX': 'teamproject',
-        'OPTIONS': {
-            'CLIENT_CLASS': 'django_redis.client.DefaultClient',
-            'CONNECTION_POOL_KWARGS': {
-                'max_connections': 1000,
-            },
-        }
-    }
-}
-
-
-DEBUG_TOOLBAR_CONFIG = {
-    # 引入jQuery库
-    'JQUERY_URL': 'https://cdn.bootcss.com/jquery/3.3.1/jquery.min.js',
-    # 工具栏是否折叠
-    'SHOW_COLLAPSED': True,
-    # 是否显示工具栏
-    'SHOW_TOOLBAR_CALLBACK': lambda x: True,
-}
-
-
 REST_FRAMEWORK = {
-    'DEFAULT_AUTHENTICATION_CLASSES':('rest_framework_jwt.authentication.JSONWebTokenAuthentication',),
+    'DEFAULT_AUTHENTICATION_CLASSES': ('rest_framework_jwt.authentication.JSONWebTokenAuthentication',),
     # 'DEFAULT_PAGINATION_CLASS': 'rest_framework.pagination.PageNumberPagination',
     'PAGE_SIZE': 10,
     'DEFAULT_VERSIONING_CLASS': 'rest_framework.versioning.URLPathVersioning',
@@ -181,14 +160,4 @@ REST_FRAMEWORK = {
 JWT_AUTH = {
     'JWT_EXPIRATION_DELTA': datetime.timedelta(weeks=2),
 }
-
-
-# Docker-compose local
-# DATABASES['default']['HOST'] = 'database_local'
-# CACHES['default']['LOCATION'] = 'redis://redis_local:6379/0'
-
-# Docker-compose production
-DATABASES['default']['HOST'] = 'database-pdct'
-CACHES['default']['LOCATION'] = 'redis://redis-pdct:6379/0'
-
 

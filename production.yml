@@ -1,79 +1,64 @@
 version: '3'
 
 volumes:
-  static:
-  database:
-  esdata:
+  static_pdct:
+  database_pdct:
 
 services:
-  web:
+  web-pdct:
     build:
       context: .
       dockerfile: compose/production/Django/Dockerfile
-    image: blog_web
-    container_name: blog_web
+    image: blog_web_pdct
+    container_name: blog-web-pdct # 不能带下划线，不然Django 报错
     working_dir: /blog_project
     volumes:
-      - static:/blog_project/static
-    env_file: /compose/production/Django/blog_django.env
+      - static_pdct:/blog_project/static
     ports:
       - "8000:8000"
     links:
-      - database
-      - redis
-      - elasticsearch
+      - database-pdct
+      - redis-pdct
     depends_on:
-      - database
-      - redis
-      - elasticsearch
+      - database-pdct
+      - redis-pdct
     command: /start.sh
 
-  ngnix:
+  ngnix-pdct:
     build:
       context: .
       dockerfile: compose/production/nginx/Dockerfile
-    image: blog_ngnix
-    container_name: blog_ngnix
+    image: blog_ngnix_pdct
+    container_name: blog-ngnix-pdct
     volumes:
-    - static:apps/blog_project/static
+    - static_pdct:/apps/blog_project/static
     ports:
     - "80:80"
     - "443:443"
     depends_on:
-      - web
+      - web-pdct
 
-  elasticsearch:
+  redis-pdct:
     build:
       context: .
-      dockerfile: ./compose/production/elasticsearch/Dockerfile
-    image: blog_elasticsearch
-    container_name: blog_elasticsearch
-    volumes:
-      - esdata:/usr/share/elasticsearch/data
-    ports:
-      - "9200:9200"
-    environment:
-      - "ES_JAVA_OPTS=-Xms512m -Xmx512m"
-    ulimits:
-      memlock:
-        soft: -1
-        hard: -1
-      nproc: 65536
-      nofile:
-        soft: 65536
-        hard: 65536
-
-  redis:
+      dockerfile: compose/production/Redis/Dockerfile
     image: redis
-    container_name: blog_redis
+    container_name: blog-redis-pdct
     ports:
       - "6379:6379"
-  database:
+
+  database-pdct:
     image: mysql:5.7
-    container_name: blog_database
+    container_name: blog-database-pdct
+    command: mysqld --character-set-server=utf8 --collation-server=utf8_unicode_ci --init-connect='SET NAMES UTF8;' --innodb-flush-log-at-trx-commit=0
+
     environment:
-      MYSQL_ROOT_PASSWORD: 'sheep'
+      MYSQL_DATABASE: "${DB_NAME}"
+      MYSQL_USER: "${DB_USER}"
+      MYSQL_PASSWORD: "${DB_PW}"
+      MYSQL_ROOT_PASSWORD: "${DB_ROOT_PW}"
+
     ports:
       - "3306:3306"
     volumes:
-      - database:var/lib/mysql
+      - database_pdct:/var/lib/mysql

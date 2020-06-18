@@ -37,16 +37,14 @@ router.get_api_root_view().cls.__doc__ = "这里是基于 Django rest-framework 
 
 urlpatterns = [
     path('hangxiadmin/', admin.site.urls),
-    path('', include('myblog.urls')),
-    path('', include('comments.urls')),
     path("api/<version>/", include(router.urls)),
     path('login/', obtain_jwt_token, name='login'),
 ]
 
-if settings.DEBUG:
-
-    import debug_toolbar
-
-    urlpatterns.insert(0, path('__debug__/', include(debug_toolbar.urls)))
+# if settings.DEBUG:
+#
+#     import debug_toolbar
+#
+#     urlpatterns.insert(0, path('__debug__/', include(debug_toolbar.urls)))
 
 

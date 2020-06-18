@@ -1,9 +1,7 @@
 from django.core.cache import cache
-from django.core.cache.utils import make_template_fragment_key
 from django.db import models
 
 # Create your models here.
-from django.utils import timezone
 
 
 class Comment(models.Model):

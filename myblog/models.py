@@ -5,7 +5,6 @@ from django.core.cache import cache
 from django.db import models
 
 # Create your models here.
-from django.urls import reverse
 from django.utils import timezone
 from django.utils.html import strip_tags
 
@@ -64,9 +63,6 @@ class Post(models.Model):
         verbose_name = '文章'
         verbose_name_plural = verbose_name
         ordering = ['-created_time']
-
-    def get_absolute_url(self):  # The method to tell Django how to calculate the canonical URL for an object.
-        return reverse('myblog:detail', kwargs={'pk': self.pk})
 
     def __str__(self):
         return self.title
