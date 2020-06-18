@@ -24,7 +24,7 @@ services:
 #  redis_local:
 #    build:
 #    context: .
-#    dockerfile: compose/production/Redis/Dockerfile
+#    dockerfile: compose/local/Redis/Dockerfile
 #    image: redis
 #    container_name: blog-redis-local
 #    ports:
@@ -33,9 +33,11 @@ services:
   web-local:
     build:
       context: .
-      dockerfile: compose/local/Dockerfile
+      dockerfile: compose/local/Django/Dockerfile
     image: blog_web_local
     container_name: blog-web-local
+    environment:
+      PROJECT_ENV: local
     volumes:
       - .:/blog_project
     ports:

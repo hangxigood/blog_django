@@ -1,16 +1,6 @@
-import re
 
-import markdown
 from django.db.models.functions import ExtractYear, ExtractMonth
-from django.shortcuts import get_object_or_404
 
-# Create your views here.
-from django.utils.decorators import method_decorator
-from django.utils.text import slugify
-from django.views.decorators.cache import never_cache
-from django.views.generic import ListView, DetailView
-from markdown.extensions.toc import TocExtension
-from pure_pagination import PaginationMixin
 from rest_framework import mixins, pagination
 from rest_framework.permissions import BasePermission, SAFE_METHODS
 from rest_framework.viewsets import GenericViewSet, ModelViewSet

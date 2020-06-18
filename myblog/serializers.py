@@ -1,7 +1,6 @@
 from django.db.models import Count
-from django.http import request
-from django.urls import reverse
 from rest_framework import serializers
+from rest_framework.reverse import reverse
 
 import comments
 from comments.views import CommentSerializer
@@ -18,7 +17,7 @@ class CategoryListSerializer(serializers.HyperlinkedModelSerializer):
         ]
 
     def get_posts_url(self, obj):
-        return 'http://blog.frankxiang.xyz/api/v1/Post/?category=' + str(obj.id)
+        return reverse('post-list', request=self.context['request']) + '?category=%s' % str(obj.id)
 
 
 class TagsListSerializer(serializers.ModelSerializer):
@@ -32,7 +31,7 @@ class TagsListSerializer(serializers.ModelSerializer):
         ]
 
     def get_posts_url(self, obj):
-        return 'http://blog.frankxiang.xyz/api/v1/Post/?tags=' + str(obj.id)
+        return reverse('post-list', request=self.context['request']) + '?tags=%s' % str(obj.id)
 
 
 class PostListSerializer(serializers.HyperlinkedModelSerializer):
@@ -92,11 +91,7 @@ class ArchiveDetailSerializer(serializers.Serializer):
     posts_url = serializers.SerializerMethodField()
 
     def get_posts_url(self, obj):
-        return 'http://blog.frankxiang.xyz/api/v1/Post/?year={}&month={}'.format(obj['year'], obj['month'])
-
-    # def get_posts(self,obj):
-    #     queryset = Post.objects.filter(created_time__year=obj['year'], created_time__month=obj['month'])
-    #     return PostListSerializer(queryset, many=True, context={'request': self.context.get('request')}).data
+        return reverse('post-list', request=self.context['request']) + '?year={}&month={}'.format(obj['year'], obj['month'])
 
 
 class PostDetailSerializer(serializers.HyperlinkedModelSerializer):

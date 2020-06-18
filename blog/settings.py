@@ -11,6 +11,8 @@ https://docs.djangoproject.com/en/3.0/ref/settings/
 """
 import datetime
 import os
+from typing import List
+
 import environ
 
 # Build paths inside the project like this: os.path.join(BASE_DIR, ...)
@@ -23,33 +25,28 @@ BASE_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 
 # SECURITY WARNING: don't run with debug turned on in production!
 env = environ.Env(
-    DEBUG=(bool, False)
+    DEBUG=(bool, False),
 )
 
-environ.Env.read_env()
+env_name = env.str('PROJECT_ENV', 'local')
+env.read_env(os.path.join(BASE_DIR, 'blog/envs/env.%s' % env_name))
+
 DEBUG = env('DEBUG')
 SECRET_KEY = env('SECRET_KEY')
+ALLOWED_HOSTS = tuple(env.list('ALLOWED_HOSTS', default=[]))
 
 DATABASES = {
     'default': env.db(),
 }
-
-CACHES = {
-    'default': env.cache(),
-}
+# 只有生产环境下才使用缓存
+if os.getenv('PROJECT_ENV') == 'product':
+    CACHES = {
+        'default': env.cache(),
+    }
 
 CACHE_MIDDLEWARE_ALIAS = 'default'
 CACHE_MIDDLEWARE_SECONDS = 300
 CACHE_MIDDLEWARE_KEY_PREFIX = 'django:cache'
-
-ALLOWED_HOSTS = [
-    "localhost",
-    "0.0.0.0",
-    "127.0.0.1",
-    "blog-web-pdct",
-    "blog-web-local",
-    "blog.frankxiang.xyz",
-]
 
 # Application definition
 

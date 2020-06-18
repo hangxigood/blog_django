@@ -11,6 +11,8 @@ services:
       dockerfile: compose/production/Django/Dockerfile
     image: blog_web_pdct
     container_name: blog-web-pdct # 不能带下划线，不然Django 报错
+    environment:
+      PROJECT_ENV: product
     working_dir: /blog_project
     volumes:
       - static_pdct:/blog_project/static

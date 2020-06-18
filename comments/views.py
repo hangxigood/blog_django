@@ -9,6 +9,7 @@ from django.views.decorators.http import require_POST
 from django.http import request
 from rest_framework import mixins, serializers
 from rest_framework.permissions import IsAuthenticated
+from rest_framework.reverse import reverse
 from rest_framework.viewsets import GenericViewSet
 
 from comments.models import Comment
@@ -17,11 +18,12 @@ from comments.models import Comment
 基于 Django restful-framework 开发的 API
 '''
 
+
 class CommentSerializer(serializers.ModelSerializer):
     post_url = serializers.SerializerMethodField(read_only=True)
 
     def get_post_url(self, obj):
-        return 'http://blog.frankxiang.xyz/api/v1/Post/{}'.format(obj.post.id)
+        return reverse('post-list', request=self.context['request']) + str(obj.post_id)
 
     class Meta:
         model = Comment
