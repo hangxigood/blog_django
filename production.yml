@@ -26,25 +26,35 @@ services:
       - redis-pdct
     command: /start.sh
 
-  ngnix-pdct:
+  nginx-pdct:
     build:
       context: .
-      dockerfile: compose/production/nginx/Dockerfile
-    image: blog_ngnix_pdct
-    container_name: blog-ngnix-pdct
+      dockerfile: compose/production/Nginx/Dockerfile
+    image: blog_nginx_pdct
+    container_name: blog-nginx-pdct
     volumes:
-    - static_pdct:/apps/blog_project/static
+    - static_pdct:/apps/blog_project/static # 共享 Django 的静态文件
+    - ./compose/production/certbot/conf:/etc/letsencrypt # certbot 相关
+    - ./compose/production/certbot/www:/var/www/certbot
     ports:
     - "80:80"
     - "443:443"
     depends_on:
       - web-pdct
+    command: "/bin/sh -c 'while :; do sleep 6h & wait $${!}; nginx -s reload; done & nginx -g \"daemon off;\"'"
+
+  certbot:
+    image: certbot/certbot
+    volumes:
+      - ./compose/production/certbot/conf:/etc/letsencrypt # certbot 相关
+      - ./compose/production/certbot/www:/var/www/certbot
+    entrypoint: "/bin/sh -c 'trap exit TERM; while :; do certbot renew; sleep 12h & wait $${!}; done;'"
 
   redis-pdct:
     build:
       context: .
       dockerfile: compose/production/Redis/Dockerfile
-    image: redis
+    image: blog_redis_pdct
     container_name: blog-redis-pdct
     ports:
       - "6379:6379"
@@ -52,9 +62,10 @@ services:
   database-pdct:
     image: mysql:5.7
     container_name: blog-database-pdct
-    command: mysqld --character-set-server=utf8 --collation-server=utf8_unicode_ci --init-connect='SET NAMES UTF8;' --innodb-flush-log-at-trx-commit=0
+    command: mysqld --character-set-server=utf8 --collation-server=utf8_unicode_ci
 
     environment:
+      TZ: "Asia/Shanghai"
       MYSQL_DATABASE: "${DB_NAME}"
       MYSQL_USER: "${DB_USER}"
       MYSQL_PASSWORD: "${DB_PW}"
@@ -64,3 +75,4 @@ services:
       - "3306:3306"
     volumes:
       - database_pdct:/var/lib/mysql
+      - ./compose/production/Mysql/my.cnf:/etc/mysql/my.cnf
