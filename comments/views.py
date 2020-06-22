@@ -1,12 +1,6 @@
 import rest_framework
-from django.contrib import messages
-from django.shortcuts import render, get_object_or_404, redirect
 
 # Create your views here.
-from django.utils.decorators import method_decorator
-from django.views.decorators.cache import never_cache
-from django.views.decorators.http import require_POST
-from django.http import request
 from rest_framework import mixins, serializers
 from rest_framework.permissions import IsAuthenticated
 from rest_framework.reverse import reverse
@@ -17,7 +11,6 @@ from comments.models import Comment
 '''
 基于 Django restful-framework 开发的 API
 '''
-
 
 class CommentSerializer(serializers.ModelSerializer):
     post_url = serializers.SerializerMethodField(read_only=True)

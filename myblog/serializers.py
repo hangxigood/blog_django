@@ -7,7 +7,7 @@ from comments.views import CommentSerializer
 from myblog.models import Post, Category, Tag
 
 
-class CategoryListSerializer(serializers.HyperlinkedModelSerializer):
+class CategoryListSerializer(serializers.ModelSerializer):
     posts_url = serializers.SerializerMethodField()
 
     class Meta:
@@ -35,7 +35,8 @@ class TagsListSerializer(serializers.ModelSerializer):
         return ''.join([reverse('post-list', request=self.context['request']), '?tags=%s' % str(obj.id)])
 
 
-class PostListSerializer(serializers.HyperlinkedModelSerializer):
+class PostListSerializer(serializers.ModelSerializer):
+    url = serializers.HyperlinkedIdentityField(view_name='post-detail', lookup_field='id')
     category = CategoryListSerializer()
     author = serializers.StringRelatedField()
     tags = TagsListSerializer(many=True)
@@ -65,9 +66,6 @@ class PostListSerializer(serializers.HyperlinkedModelSerializer):
             'views',
             'comments_num',
         )
-        extra_kwargs = {
-            'url': {'lookup_field': 'id'}
-        }
 
 
 class PostPostSerializer(serializers.ModelSerializer):
@@ -95,7 +93,8 @@ class ArchiveDetailSerializer(serializers.Serializer):
                         '?year=%s&month=%s' % (obj['year'], obj['month'])])
 
 
-class PostDetailSerializer(serializers.HyperlinkedModelSerializer):
+class PostDetailSerializer(serializers.ModelSerializer):
+    url = serializers.HyperlinkedIdentityField(view_name='post-detail', lookup_field='id')
     category = CategoryListSerializer()
     author = serializers.StringRelatedField()
     tags = TagsListSerializer(many=True)
@@ -111,6 +110,7 @@ class PostDetailSerializer(serializers.HyperlinkedModelSerializer):
             'title',
             'url',
             'author',
+            'created_time',
             'excerpt',
             'body',
             'category',
@@ -120,9 +120,6 @@ class PostDetailSerializer(serializers.HyperlinkedModelSerializer):
             'comments',
         ]
 
-        extra_kwargs = {
-            'url': {'lookup_field': 'id'}
-        }
 
 
 
