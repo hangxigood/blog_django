@@ -23,7 +23,7 @@ class CommentSerializer(serializers.ModelSerializer):
     post_url = serializers.SerializerMethodField(read_only=True)
 
     def get_post_url(self, obj):
-        return reverse('post-list', request=self.context['request']) + str(obj.post_id)
+        return ''.join([reverse('post-list', request=self.context['request']), str(obj.post_id)])
 
     class Meta:
         model = Comment

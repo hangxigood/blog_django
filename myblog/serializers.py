@@ -9,6 +9,7 @@ from myblog.models import Post, Category, Tag
 
 class CategoryListSerializer(serializers.HyperlinkedModelSerializer):
     posts_url = serializers.SerializerMethodField()
+
     class Meta:
         model = Category
         fields = [
@@ -17,7 +18,7 @@ class CategoryListSerializer(serializers.HyperlinkedModelSerializer):
         ]
 
     def get_posts_url(self, obj):
-        return reverse('post-list', request=self.context['request']) + '?category=%s' % str(obj.id)
+        return ''.join([reverse('post-list', request=self.context['request']), '?category=%s' % str(obj.id)])
 
 
 class TagsListSerializer(serializers.ModelSerializer):
@@ -31,7 +32,7 @@ class TagsListSerializer(serializers.ModelSerializer):
         ]
 
     def get_posts_url(self, obj):
-        return reverse('post-list', request=self.context['request']) + '?tags=%s' % str(obj.id)
+        return ''.join([reverse('post-list', request=self.context['request']), '?tags=%s' % str(obj.id)])
 
 
 class PostListSerializer(serializers.HyperlinkedModelSerializer):
@@ -42,7 +43,6 @@ class PostListSerializer(serializers.HyperlinkedModelSerializer):
 
     def get_comments_num(self, obj):
         return obj.comments_count
-        # return obj.comments.count()
 
     @staticmethod
     def setup_eager_loading(cls, queryset):
@@ -71,7 +71,7 @@ class PostListSerializer(serializers.HyperlinkedModelSerializer):
 
 
 class PostPostSerializer(serializers.ModelSerializer):
-    post = serializers.HyperlinkedIdentityField(view_name='post-detail', lookup_field='id' , read_only=True)
+    post = serializers.HyperlinkedIdentityField(view_name='post-detail', lookup_field='id', read_only=True)
 
     class Meta:
         model = Post
@@ -91,7 +91,8 @@ class ArchiveDetailSerializer(serializers.Serializer):
     posts_url = serializers.SerializerMethodField()
 
     def get_posts_url(self, obj):
-        return reverse('post-list', request=self.context['request']) + '?year={}&month={}'.format(obj['year'], obj['month'])
+        return ''.join([reverse('post-list', request=self.context['request']),
+                        '?year=%s&month=%s' % (obj['year'], obj['month'])])
 
 
 class PostDetailSerializer(serializers.HyperlinkedModelSerializer):
