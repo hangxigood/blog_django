@@ -154,6 +154,7 @@ REST_FRAMEWORK = {
     'DEFAULT_VERSION': 'v1',
     'VERSION_PARAM': 'version',
     'ALLOWED_VERSIONS': ['v1'],
+    'DATETIME_FORMAT': '%Y-%m-%d %H:%M:%S',
 }
 
 JWT_AUTH = {
