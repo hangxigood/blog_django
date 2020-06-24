@@ -12,6 +12,7 @@ from comments.models import Comment
 基于 Django restful-framework 开发的 API
 '''
 
+
 class CommentSerializer(serializers.ModelSerializer):
     post_url = serializers.SerializerMethodField(read_only=True)
 

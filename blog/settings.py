@@ -60,6 +60,7 @@ INSTALLED_APPS = [
     'myblog',
     'comments',
     'rest_framework',
+    'corsheaders',
     # 'debug_toolbar',
 ]
 
@@ -79,6 +80,7 @@ MIDDLEWARE = [
     'django.middleware.cache.UpdateCacheMiddleware',
     'django.middleware.security.SecurityMiddleware',
     'django.contrib.sessions.middleware.SessionMiddleware',
+    'corsheaders.middleware.CorsMiddleware', # 解决跨域问题
     'django.middleware.common.CommonMiddleware',
     'django.middleware.csrf.CsrfViewMiddleware',
     'django.contrib.auth.middleware.AuthenticationMiddleware',
@@ -87,6 +89,8 @@ MIDDLEWARE = [
     # 'debug_toolbar.middleware.DebugToolbarMiddleware',
     'django.middleware.cache.FetchFromCacheMiddleware',
 ]
+
+CORS_ORIGIN_ALLOW_ALL = True  # 全部域名可访问
 
 ROOT_URLCONF = 'blog.urls'
 

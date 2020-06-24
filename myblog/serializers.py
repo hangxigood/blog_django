@@ -1,7 +1,6 @@
 from django.db.models import Count
 from rest_framework import serializers
 from rest_framework.reverse import reverse
-from rest_framework.settings import api_settings
 
 import comments
 from comments.views import CommentSerializer
@@ -14,6 +13,7 @@ class CategoryListSerializer(serializers.ModelSerializer):
     class Meta:
         model = Category
         fields = [
+            'id',
             'name',
             'posts_url',
         ]
@@ -28,6 +28,7 @@ class TagsListSerializer(serializers.ModelSerializer):
     class Meta:
         model = Tag
         fields = [
+            'id',
             'name',
             'posts_url',
         ]
@@ -44,7 +45,7 @@ class PostListSerializer(serializers.ModelSerializer):
     comments_num = serializers.SerializerMethodField()
 
     def get_comments_num(self, obj):
-        return obj.comments_count
+        return obj.comments.count()
 
     @staticmethod
     def setup_eager_loading(cls, queryset):
@@ -57,6 +58,7 @@ class PostListSerializer(serializers.ModelSerializer):
     class Meta:
         model = Post
         fields = (
+            'id',
             'title',
             'url',
             'author',
@@ -99,6 +101,7 @@ class PostDetailSerializer(serializers.ModelSerializer):
     category = CategoryListSerializer()
     author = serializers.StringRelatedField()
     tags = TagsListSerializer(many=True)
+    body_html = serializers.CharField()
     comments_num = serializers.SerializerMethodField()
     comments = CommentSerializer(many=True)
 
@@ -114,7 +117,7 @@ class PostDetailSerializer(serializers.ModelSerializer):
             'created_time',
             'modified_time',
             'excerpt',
-            'body',
+            'body_html',
             'category',
             'tags',
             'views',
