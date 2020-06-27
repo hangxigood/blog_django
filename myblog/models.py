@@ -47,7 +47,7 @@ class Post(models.Model):
     category = models.ForeignKey(Category, related_name='posts', verbose_name='分类', on_delete=models.CASCADE)
     # one to many, delete together. always define in the many.
     tags = models.ManyToManyField(Tag, related_name='posts', verbose_name='标签', blank=True)
-    author = models.ForeignKey(User, default=7, verbose_name='作者', on_delete=models.CASCADE)
+    author = models.ForeignKey(User, default=1, verbose_name='作者', on_delete=models.CASCADE)
     views = models.PositiveIntegerField(verbose_name='阅读数', default=0)
 
     def increase_views(self):

@@ -1,7 +1,9 @@
 version: '3'
 
 volumes:
-  static_pdct:
+  static_pdct_admin:
+  static_pdct_DRF:
+  static_pdct_blog:
   database_pdct:
 
 services:
@@ -15,7 +17,9 @@ services:
       PROJECT_ENV: product
     working_dir: /blog_project
     volumes:
-      - static_pdct:/blog_project/static
+      - static_pdct_admin:/blog_project/frontend/dist/static/admin
+      - static_pdct_DRF:/blog_project/frontend/dist/static/rest_framework
+      - static_pdct_blog:/blog_project/frontend/dist/static/blog
     ports:
       - "8000:8000"
     links:
@@ -33,7 +37,9 @@ services:
     image: blog_nginx_pdct
     container_name: blog-nginx-pdct
     volumes:
-    - static_pdct:/apps/blog_project/static # 共享 Django 的静态文件
+    - static_pdct_admin:/apps/blog_project/dist/static/admin # 共享 Django 的静态文件
+    - static_pdct_DRF:/apps/blog_project/dist/static/rest_framework
+    - static_pdct_blog:/apps/blog_project/dist/static/blog
     - ./compose/production/certbot/conf:/etc/letsencrypt # certbot 相关
     - ./compose/production/certbot/www:/var/www/certbot
     ports:
