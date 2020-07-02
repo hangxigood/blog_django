@@ -1,4 +1,3 @@
-
 import markdown
 from django.contrib.auth.models import User
 from django.core.cache import cache
@@ -32,17 +31,13 @@ class Tag(models.Model):
         return self.name
 
 
-def generate_markdown_content(value):
-    content = markdown.markdown(value, extensions=["markdown.extensions.extra",
-                                "markdown.extensions.codehilite"])
-    return {"content": content}
-
-
 class Post(models.Model):
     title = models.CharField(verbose_name='标题', max_length=70)
     body = models.TextField(verbose_name='正文')
-    created_time = models.DateTimeField(verbose_name='创建时间', default=timezone.now) # auto_now_add=True 也可以 default=timezone.now
-    modified_time = models.DateTimeField(verbose_name='修改时间', auto_now=True) # auto_now=True 也可以在save 中 self.modified_time = timezone.now()
+    created_time = models.DateTimeField(verbose_name='创建时间',
+                                        default=timezone.now)  # auto_now_add=True 也可以 default=timezone.now
+    modified_time = models.DateTimeField(verbose_name='修改时间',
+                                         auto_now=True)  # auto_now=True 也可以在save 中 self.modified_time = timezone.now()
     excerpt = models.CharField(verbose_name='摘要', max_length=200, blank=True)
     category = models.ForeignKey(Category, related_name='posts', verbose_name='分类', on_delete=models.CASCADE)
     # one to many, delete together. always define in the many.
@@ -66,12 +61,20 @@ class Post(models.Model):
 
         super().save(*args, **kwargs)
 
+    @staticmethod
+    def generate_markdown_content(value):
+        content = markdown.markdown(value, extensions=[
+            'markdown.extensions.extra',
+            'markdown.extensions.codehilite',
+        ])
+        return {"content": content}
+
     def body_html(self):
         return self.get_markdown_content.get("content", "")
 
     @cached_property
     def get_markdown_content(self):
-        return generate_markdown_content(self.body)
+        return self.generate_markdown_content(self.body)
 
     class Meta:
         verbose_name = '文章'
@@ -80,4 +83,3 @@ class Post(models.Model):
 
     def __str__(self):
         return self.title
-
