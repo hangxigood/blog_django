@@ -64,7 +64,6 @@ INSTALLED_APPS = [
     # 'debug_toolbar',
 ]
 
-
 DEBUG_TOOLBAR_CONFIG = {
     # 引入jQuery库
     'JQUERY_URL': 'https://cdn.bootcss.com/jquery/3.3.1/jquery.min.js',
@@ -81,7 +80,7 @@ MIDDLEWARE = [
     'django.middleware.cache.UpdateCacheMiddleware',
     'django.middleware.security.SecurityMiddleware',
     'django.contrib.sessions.middleware.SessionMiddleware',
-    'corsheaders.middleware.CorsMiddleware', # 解决跨域问题
+    'corsheaders.middleware.CorsMiddleware',  # 解决跨域问题
     'django.middleware.common.CommonMiddleware',
     'django.middleware.csrf.CsrfViewMiddleware',
     'django.contrib.auth.middleware.AuthenticationMiddleware',
@@ -166,3 +165,5 @@ JWT_AUTH = {
     'JWT_EXPIRATION_DELTA': datetime.timedelta(weeks=2),
 }
 
+MEDIA_ROOT = os.path.join(BASE_DIR, 'media')  # media即为图片上传的根路径
+MEDIA_URL = '/media/'

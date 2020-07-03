@@ -31,6 +31,17 @@ class Tag(models.Model):
         return self.name
 
 
+class Img(models.Model):
+    img_url = models.ImageField(upload_to='images/')  # upload_to指定图片上传的途径，如果不存在则自动创建
+
+    class Meta:
+        verbose_name = '图片'
+        verbose_name_plural = verbose_name
+
+    def __str__(self):
+        return self.img_url.name
+
+
 class Post(models.Model):
     title = models.CharField(verbose_name='标题', max_length=70)
     body = models.TextField(verbose_name='正文')

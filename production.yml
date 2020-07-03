@@ -5,6 +5,7 @@ volumes:
   static_pdct_DRF:
   static_pdct_blog:
   database_pdct:
+  static_pdct_media:
 
 services:
   web-pdct:
@@ -20,6 +21,7 @@ services:
       - static_pdct_admin:/blog_project/frontend/dist/static/admin
       - static_pdct_DRF:/blog_project/frontend/dist/static/rest_framework
       - static_pdct_blog:/blog_project/frontend/dist/static/blog
+      - static_pdct_media:/blog_project/media
     ports:
       - "8000:8000"
     links:
@@ -38,6 +40,7 @@ services:
     container_name: blog-nginx-pdct
     volumes:
     - static_pdct_admin:/apps/blog_project/dist/static/admin # 共享 Django 的静态文件
+    - static_pdct_media:/apps/blog_project/media
     - static_pdct_DRF:/apps/blog_project/dist/static/rest_framework
     - static_pdct_blog:/apps/blog_project/dist/static/blog
     - ./compose/production/certbot/conf:/etc/letsencrypt # certbot 相关

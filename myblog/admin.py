@@ -1,7 +1,7 @@
 from django.contrib import admin
 
 # Register your models here.
-from myblog.models import Post, Category, Tag
+from myblog.models import Post, Category, Tag, Img
 
 
 class PostAdmin(admin.ModelAdmin):
@@ -18,4 +18,4 @@ class PostAdmin(admin.ModelAdmin):
 admin.site.register(Post, PostAdmin)
 admin.site.register(Category)
 admin.site.register(Tag)
-
+admin.site.register(Img)

@@ -1,21 +1,24 @@
-FROM python:3.8-alpine
+FROM python:3.8
 
 ENV PYTHONUNBUFFERED 1
 
-RUN set -e; \
-        apk add --no-cache --virtual .build-deps \
-                gcc \
-                libc-dev \
-                linux-headers \
-                mariadb-dev \
-                python3-dev \
-                postgresql-dev \
-        ;
+#RUN set -e; \
+#        apk add --no-cache --virtual .build-deps \
+#                gcc \
+#                libc-dev \
+#                linux-headers \
+#                mariadb-dev \
+#                python3-dev \
+#                postgresql-dev \
+#        ;
 
 # 设置时区为上海
-RUN apk add tzdata && cp /usr/share/zoneinfo/Asia/Shanghai /etc/localtime \
-    && echo "Asia/Shanghai" > /etc/timezone \
-    && apk del tzdata
+RUN cp /usr/share/zoneinfo/Asia/Shanghai /etc/localtime
+
+# 设置时区为上海
+#RUN apk add tzdata && cp /usr/share/zoneinfo/Asia/Shanghai /etc/localtime \
+#    && echo "Asia/Shanghai" > /etc/timezone \
+#    && apk del tzdata
 
 RUN mkdir /blog_project
 
